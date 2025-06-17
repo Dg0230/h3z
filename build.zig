@@ -221,6 +221,14 @@ pub fn build(b: *std.Build) void {
     const run_benchmarks = b.addRunArtifact(benchmark_tests);
     const benchmark_step = b.step("benchmark", "Run performance benchmarks");
     benchmark_step.dependOn(&run_benchmarks.step);
+
+    // Performance analysis tools
+    addPerformanceTool(b, lib_mod, target, optimize, log_options, "performance_analysis", "tools/performance/performance_analysis.zig");
+    addPerformanceTool(b, lib_mod, target, optimize, log_options, "load_test", "tools/performance/load_test_analysis.zig");
+    addPerformanceTool(b, lib_mod, target, optimize, log_options, "simple_perf_test", "tools/performance/simple_performance_test.zig");
+    addPerformanceTool(b, lib_mod, target, optimize, log_options, "optimized_perf_test", "tools/performance/optimized_performance_test.zig");
+    addPerformanceTool(b, lib_mod, target, optimize, log_options, "performance_fixes", "tools/performance/performance_fixes.zig");
+    addPerformanceTool(b, lib_mod, target, optimize, log_options, "memory_leak_test", "tools/performance/memory_leak_test.zig");
 }
 
 fn addExample(
@@ -299,4 +307,37 @@ fn addTestCategory(
     const test_step_desc = b.fmt("Run {s} tests", .{category});
     const test_step = b.step(test_step_name, test_step_desc);
     test_step.dependOn(&run_test.step);
+}
+
+fn addPerformanceTool(
+    b: *std.Build,
+    lib_mod: *std.Build.Module,
+    target: std.Build.ResolvedTarget,
+    optimize: std.builtin.OptimizeMode,
+    log_options: *std.Build.Step.Options,
+    name: []const u8,
+    path: []const u8,
+) void {
+    const tool_exe = b.addExecutable(.{
+        .name = name,
+        .root_source_file = b.path(path),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    tool_exe.root_module.addImport("h3", lib_mod);
+    tool_exe.root_module.addImport("log_options", log_options.createModule());
+    b.installArtifact(tool_exe);
+
+    const run_cmd = b.addRunArtifact(tool_exe);
+    run_cmd.step.dependOn(b.getInstallStep());
+
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    const run_step_name = b.fmt("run-{s}", .{name});
+    const run_step_desc = b.fmt("Run {s} performance tool", .{name});
+    const run_step = b.step(run_step_name, run_step_desc);
+    run_step.dependOn(&run_cmd.step);
 }

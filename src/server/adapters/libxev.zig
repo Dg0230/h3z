@@ -595,7 +595,7 @@ pub const LibxevAdapter = struct {
         logger.logDefault(.debug, .general, "[CB READ] conn_id={}, compl_ptr={}", .{ conn.id, completion });
         const bytes_read = result catch |err| {
             switch (err) {
-                error.EOF, error.ConnectionResetByPeer, error.BrokenPipe, error.ConnectionTimedOut => {
+                error.EOF, error.ConnectionResetByPeer => {
                     logger.logDefault(.debug, .connection, "Connection closed: {}", .{err});
                 },
                 else => {

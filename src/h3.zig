@@ -72,6 +72,12 @@ pub const FastMiddleware = @import("core/fast_middleware.zig").FastMiddleware;
 pub const FastMiddlewareChain = @import("core/fast_middleware.zig").FastMiddlewareChain;
 pub const CommonMiddleware = @import("core/fast_middleware.zig").CommonMiddleware;
 
+// Re-export optimized components
+pub const optimized = @import("core/optimized.zig");
+pub const OptimizedEventPool = optimized.EventPool;
+pub const OptimizedMemoryManager = optimized.MemoryManager;
+pub const OptimizedRouteCache = optimized.RouteCache;
+
 // Re-export HTTP types
 pub const HttpMethod = @import("http/method.zig").HttpMethod;
 pub const HttpStatus = @import("http/status.zig").HttpStatus;

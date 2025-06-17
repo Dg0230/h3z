@@ -15,7 +15,7 @@ test "Benchmark: Route lookup performance" {
     const allocator = gpa.allocator();
 
     // Create app with many routes
-    var app = h3.createFastApp(allocator);
+    var app = try h3.createFastApp(allocator);
     defer app.deinit();
 
     const testHandler = struct {
@@ -65,7 +65,7 @@ test "Benchmark: Fast middleware vs legacy middleware" {
 
     // Test fast middleware
     {
-        var app = h3.createFastApp(allocator);
+        var app = try h3.createFastApp(allocator);
         defer app.deinit();
 
         _ = app.useFast(h3.fastMiddleware.logger);
@@ -94,7 +94,7 @@ test "Benchmark: Fast middleware vs legacy middleware" {
 
     // Test legacy middleware
     {
-        var app = h3.createApp(allocator);
+        var app = try h3.createApp(allocator);
         defer app.deinit();
 
         _ = app.use(h3.middleware.logger);
@@ -185,7 +185,7 @@ test "Benchmark: Basic performance test" {
 
     // Test app creation and basic operations
     {
-        var app = h3.createFastApp(allocator);
+        var app = try h3.createFastApp(allocator);
         defer app.deinit();
 
         const testHandler = struct {
@@ -210,7 +210,7 @@ test "Benchmark: Basic performance test" {
 
     // Test standard app for comparison
     {
-        var app = h3.createApp(allocator);
+        var app = try h3.createApp(allocator);
         defer app.deinit();
 
         const testHandler = struct {
